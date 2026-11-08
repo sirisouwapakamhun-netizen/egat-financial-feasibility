@@ -24,7 +24,7 @@ create table if not exists public.workspace_settings (
 
 -- Keep updated_at current
 create or replace function public.touch_updated_at()
-returns trigger language plpgsql as $$
+returns trigger language plpgsql set search_path = '' as $$
 begin
   new.updated_at = now();
   return new;
