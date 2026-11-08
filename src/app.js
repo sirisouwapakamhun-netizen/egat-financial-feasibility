@@ -1,5 +1,11 @@
 import "./styles/app.css";
-import { buildBessScenario, evaluateScenario } from "./model.js";
+import {
+  buildBessScenario,
+  buildHybridScenario,
+  buildSolarScenario,
+  evaluateScenario,
+  solarAvoidedRate,
+} from "./model.js";
 import {
   ACESFilmicToneMapping,
   CatmullRomCurve3,
@@ -103,7 +109,15 @@ const zt = {
           ...buildBessScenario(e),
           note: "BESS Feasibility Model_rev01.xlsx · " + e,
         }
-      : {}),
+      : t === "solar"
+        ? {
+            ...buildSolarScenario(e),
+            note: "สูตร Solar PPA (src/model.js) · ค่าตั้งต้นเป็นค่าประมาณ · " + e,
+          }
+        : {
+            ...buildHybridScenario(e),
+            note: "สูตร Solar + Battery (src/model.js) · ค่าตั้งต้นเป็นค่าประมาณ · " + e,
+          }),
   }),
   un = () =>
     globalThis.crypto?.randomUUID?.() ??
@@ -738,7 +752,7 @@ function yr(t, e = !1) {
       life: r.project_life,
     };
   const n = r.energy_y1_kwh ?? 0,
-    i = r.peak_rate ?? 4.1839,
+    i = solarAvoidedRate(r.peak_rate ?? 4.1839, r.offpeak_rate ?? 2.6037),
     a = r.ppa_rate ?? (n ? r.revenue_y1 / n : 0),
     o = n * i,
     l = n * a,
@@ -764,7 +778,7 @@ function yr(t, e = !1) {
     saving: c,
     beforeLabel: "ไฟกริด",
     afterLabel: "ไฟ PPA",
-    beforeTitle: "ถ้าซื้อไฟจากกริด (Peak)",
+    beforeTitle: "ถ้าซื้อไฟจากกริด (เฉลี่ย Peak/Off-peak)",
     afterTitle: "จ่ายค่าไฟตามสัญญา PPA",
     rateBefore: i,
     rateAfter: a,
@@ -1966,7 +1980,7 @@ const Jn = [
 ];
 function ac(t, e) {
   return `<section class="card input-card"><h3>${ve().name} · ${ze(Q()?.name ?? "")}</h3><p>ทดลองปรับตัวเลข ผลลัพธ์จะอัปเดตโดยไม่แตะข้อมูลจริง</p><div class="form-grid">${Jn.filter(
-    (r) => L !== "solar" || !["offpeak_rate", "peak_energy_kwh_day"].includes(r[0]),
+    (r) => L !== "solar" || !["peak_energy_kwh_day"].includes(r[0]),
   )
     .map(
       ([r, s, n, i, a, o]) =>

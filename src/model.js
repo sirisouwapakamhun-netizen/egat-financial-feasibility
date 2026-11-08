@@ -75,6 +75,177 @@ function buildBessScenario(i = "min", e = {}, t = {}) {
     ...t,
   };
 }
+// ---------------------------------------------------------------------------
+// Solar PPA and Solar + Battery
+//
+// Same structure as the BESS sheet: size × unit cost → investment, and
+// energy × tariff → annual revenue. Solar PPA is simply the hybrid model with
+// no battery, so both products share one formula.
+//
+// Default values are estimates for Thai C&I rooftop projects and should be
+// replaced with project / EGAT figures when available. Tariffs and the BESS
+// cost per kWh come from "BESS Feasibility Model_rev01.xlsx".
+// ---------------------------------------------------------------------------
+const SOLAR_DEFAULTS = {
+  sizeKwp: 240, // installed PV capacity
+  pvCostPerKwp: { min: 20000, max: 26000 }, // panels + inverter + installation (THB/kWp)
+  entryFee: 120000, // same as BESS sheet
+  yieldKwhPerKwp: 1350, // annual output per kWp in Thailand (approx. 1,300–1,450)
+  degradation: 0.005, // PV output loss per year
+  peakRate: BESS_DEFAULTS.peakRate, // TOU Peak (THB/kWh)
+  offpeakRate: BESS_DEFAULTS.offpeakRate, // TOU Off-peak (THB/kWh)
+  solarPeakShare: 0.71, // share of solar output in Peak hours (weekdays ≈ 5/7)
+  ppaDiscount: 0.15, // PPA price discount vs. the grid tariff the customer avoids
+  daytimeLoadKwhDay: null, // customer daytime use; null = all solar is used on site
+  exportRate: 0, // THB/kWh for solar the site cannot use (0 = curtailed)
+  tariffEscalation: 0.02, // yearly tariff growth (BESS sheet uses 2%)
+  pvOmPerKwp: 400, // O&M per kWp per year
+  omGrowth: 0.01,
+  otherCostPct: 0.005, // insurance and other costs, share of capex per year
+  otherGrowth: 0.01,
+  inverterCostPerKwp: 3000, // inverter replacement cost
+  inverterReplacementYear: 12,
+  salvagePct: 0.05,
+  projectLife: 25,
+  // Battery part (used when batteryKwh > 0) — costs from BESS sheet
+  batteryKwh: 0,
+  batterySystemCostPerKwh: BESS_DEFAULTS.systemCostPerKwh,
+  batteryInstallCostPerKwh: BESS_DEFAULTS.installCostPerKwh,
+  depthOfDischarge: 0.9,
+  roundTripEfficiency: 0.9,
+  cycleDaysPerYear: BESS_DEFAULTS.daysPerYear,
+  batteryOmPerYear: 8000, // BESS sheet O&M
+  batteryReplacementPct: 0.6, // battery replacement, share of battery system cost
+  batteryReplacementYear: 10,
+  demandChargePerKw: BESS_DEFAULTS.demandChargePerKw,
+  demandKw: BESS_DEFAULTS.demandKw,
+  demandMonthsPerYear: BESS_DEFAULTS.demandMonthsPerYear,
+};
+const HYBRID_DEFAULTS = {
+  ...SOLAR_DEFAULTS,
+  sizeKwp: 500,
+  daytimeLoadKwhDay: 1400, // solar above this is stored in the battery
+  batteryKwh: 500,
+  projectLife: 20,
+};
+
+// Grid tariff a customer avoids per solar kWh (weighted Peak / Off-peak)
+const solarAvoidedRate = (peakRate, offpeakRate, peakShare = SOLAR_DEFAULTS.solarPeakShare) =>
+  peakShare * peakRate + (1 - peakShare) * offpeakRate;
+
+function calcSolarStorage(level = "min", overrides = {}, base = SOLAR_DEFAULTS) {
+  const a = { ...base, ...overrides };
+  const hasBattery = a.batteryKwh > 0;
+
+  // Investment
+  const pvCapex = a.sizeKwp * pickLevel(a.pvCostPerKwp, level);
+  const batterySystemCost = a.batteryKwh * pickLevel(a.batterySystemCostPerKwh, level);
+  const batteryCapex = batterySystemCost + a.batteryKwh * pickLevel(a.batteryInstallCostPerKwh, level);
+  const capex = pvCapex + batteryCapex;
+  const investment = capex + a.entryFee;
+
+  // Energy (year 1)
+  const solarKwhYear = a.sizeKwp * a.yieldKwhPerKwp;
+  const solarKwhDay = solarKwhYear / 365;
+  const loadKwhDay = a.daytimeLoadKwhDay ?? Infinity;
+  const excessKwhDay = Math.max(0, solarKwhDay - loadKwhDay);
+  const storedKwhDay = hasBattery ? Math.min(excessKwhDay, a.batteryKwh * a.depthOfDischarge) : 0;
+  const deliveredKwhDay = storedKwhDay * a.roundTripEfficiency;
+  const storedKwhYear = storedKwhDay * a.cycleDaysPerYear;
+  const batteryKwhYear = deliveredKwhDay * a.cycleDaysPerYear;
+  const exportKwhYear = excessKwhDay * 365 - storedKwhYear;
+  const directKwhYear = solarKwhYear - excessKwhDay * 365;
+
+  // Prices
+  const avoidedRate = solarAvoidedRate(a.peakRate, a.offpeakRate, a.solarPeakShare);
+  const ppaRate = avoidedRate * (1 - a.ppaDiscount); // daytime solar
+  const ppaPeakRate = a.peakRate * (1 - a.ppaDiscount); // battery output in evening Peak
+
+  // Revenue (year 1)
+  const directRevenue = directKwhYear * ppaRate;
+  const batteryRevenue = batteryKwhYear * ppaPeakRate;
+  const demandCharge = hasBattery ? a.demandChargePerKw * a.demandKw * a.demandMonthsPerYear : 0;
+  const exportRevenue = exportKwhYear * a.exportRate;
+  const annualRevenue = directRevenue + batteryRevenue + demandCharge + exportRevenue;
+
+  // Customer saving vs. buying the same energy from the grid
+  const customerSaving =
+    directKwhYear * (avoidedRate - ppaRate) + batteryKwhYear * (a.peakRate - ppaPeakRate);
+
+  // Costs
+  const omY1 = a.sizeKwp * a.pvOmPerKwp + (hasBattery ? a.batteryOmPerYear : 0);
+  const otherY1 = capex * a.otherCostPct;
+  // One replacement event: battery (hybrid) or inverter (solar); hybrid replaces both together
+  const inverterCost = a.sizeKwp * a.inverterCostPerKwp;
+  const replacementYear = hasBattery ? a.batteryReplacementYear : a.inverterReplacementYear;
+  const replacementCost = (hasBattery ? batterySystemCost * a.batteryReplacementPct : 0) + inverterCost;
+
+  return {
+    level,
+    pvCapex,
+    batteryCapex,
+    capex,
+    investment,
+    solarKwhYear,
+    directKwhYear,
+    storedKwhYear,
+    batteryKwhYear,
+    exportKwhYear,
+    deliveredKwhDay,
+    avoidedRate,
+    ppaRate,
+    ppaPeakRate,
+    directRevenue,
+    batteryRevenue,
+    demandCharge,
+    exportRevenue,
+    annualRevenue,
+    customerSaving,
+    // Revenue changes with tariff growth and PV degradation together
+    revenueGrowth: (1 + a.tariffEscalation) * (1 - a.degradation) - 1,
+    omY1,
+    otherY1,
+    replacementYear: replacementYear < a.projectLife ? replacementYear : 0,
+    replacementCost: replacementYear < a.projectLife ? replacementCost : 0,
+    salvage: investment * a.salvagePct,
+    assumptions: a,
+  };
+}
+const calcSolar = (level = "min", overrides = {}) =>
+  calcSolarStorage(level, overrides, SOLAR_DEFAULTS);
+const calcHybrid = (level = "min", overrides = {}) =>
+  calcSolarStorage(level, overrides, HYBRID_DEFAULTS);
+
+function toScenario(r, extra) {
+  return {
+    ...SCENARIO_DEFAULTS,
+    project_life: r.assumptions.projectLife,
+    initial_investment: r.investment,
+    revenue_y1: r.annualRevenue,
+    revenue_growth: r.revenueGrowth,
+    om_y1: r.omY1,
+    om_growth: r.assumptions.omGrowth,
+    other_y1: r.otherY1,
+    other_growth: r.assumptions.otherGrowth,
+    salvage_value: r.salvage,
+    replacement_year: r.replacementYear,
+    replacement_cost: r.replacementCost,
+    energy_y1_kwh: r.solarKwhYear,
+    peak_rate: r.assumptions.peakRate,
+    offpeak_rate: r.assumptions.offpeakRate,
+    decision_override: "auto",
+    ...extra,
+  };
+}
+const buildSolarScenario = (level = "min", overrides = {}, extra = {}) => {
+  const r = calcSolar(level, overrides);
+  return toScenario(r, extra);
+};
+const buildHybridScenario = (level = "min", overrides = {}, extra = {}) => {
+  const r = calcHybrid(level, overrides);
+  return toScenario(r, { peak_energy_kwh_day: Math.round(r.deliveredKwhDay), ...extra });
+};
+
 function npvAt(i, e) {
   return e.reduce((t, n, r) => t + n / Math.pow(1 + i, r), 0);
 }
@@ -218,8 +389,16 @@ function evaluateScenario(i) {
 export {
   BESS_DEFAULTS,
   SCENARIO_DEFAULTS,
+  SOLAR_DEFAULTS,
+  HYBRID_DEFAULTS,
   calcBess,
   buildBessScenario,
+  solarAvoidedRate,
+  calcSolarStorage,
+  calcSolar,
+  calcHybrid,
+  buildSolarScenario,
+  buildHybridScenario,
   npvAt,
   irr,
   paybackYears,
