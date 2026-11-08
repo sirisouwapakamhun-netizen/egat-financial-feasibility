@@ -60,7 +60,7 @@ npm run build                # ได้ไฟล์ใน dist/
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_PUBLISHABLE_KEY` (publishable key เปิดเผยฝั่งเว็บได้ ข้อมูลป้องกันด้วย Row Level Security)
 
-ตอน deploy บน Vercel ให้ใส่สองค่านี้ใน Project → Settings → Environment Variables
+ค่าสำหรับ production อยู่ใน `.env.production` แล้ว Vercel จึง build ได้ทันทีโดยไม่ต้องตั้งค่าเพิ่ม
 
 ## ที่มาของโค้ด
 
