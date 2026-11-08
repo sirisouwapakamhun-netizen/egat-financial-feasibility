@@ -1,0 +1,20 @@
+{
+  "name": "egat-financial-feasibility",
+  "version": "4.0.0",
+  "description": "แพลตฟอร์มประเมินการลงทุน Solar PPA, Solar + Battery และ Battery",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.119.0",
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "vite": "^6.4.5"
+  },
+  "private": true,
+  "type": "module"
+}

@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EGAT · Energy Workspace V4</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#0c1321" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="auth-gate" class="auth-gate" hidden>
+      <div class="auth-card" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+        <div class="auth-brand">
+          <span class="brand" aria-hidden="true">E<span>／</span></span>
+          <div><b>EGAT</b><small>Energy Workspace · V4</small></div>
+        </div>
+        <h1 id="auth-title">เข้าสู่ระบบ</h1>
+        <p class="auth-sub">โครงการลูกค้าของคุณบันทึกบนคลาวด์ และเห็นได้เฉพาะบัญชีนี้</p>
+        <form id="auth-form" novalidate>
+          <label class="field"
+            >อีเมล<input
+              id="auth-email"
+              type="email"
+              required
+              autocomplete="email"
+              placeholder="you@egat.co.th" /></label
+          ><label class="field"
+            >รหัสผ่าน<input
+              id="auth-password"
+              type="password"
+              required
+              minlength="8"
+              autocomplete="current-password"
+              placeholder="อย่างน้อย 8 ตัวอักษร"
+          /></label>
+          <p id="auth-message" class="auth-message" role="alert" aria-live="polite"></p>
+          <button id="auth-submit" class="button primary" type="submit">เข้าสู่ระบบ →</button>
+        </form>
+        <button id="auth-switch" class="text-button auth-switch" type="button">
+          ยังไม่มีบัญชี? สมัครใหม่
+        </button>
+        <div class="auth-divider"><span>หรือ</span></div>
+        <button id="auth-demo" class="button auth-demo" type="button">
+          ทดลองใช้โดยไม่เข้าสู่ระบบ
+        </button>
+        <p class="auth-foot">โหมดทดลองเก็บข้อมูลในเบราว์เซอร์นี้เท่านั้น</p>
+      </div>
+    </div>
+    <a class="skip" href="#content">ข้ามไปเนื้อหา</a>
+    <div class="app-shell">
+      <aside class="rail" id="sidebar" aria-label="เมนูและโครงการ">
+        <div class="side-brand">
+          <a class="brand" href="#overview" aria-label="EGAT ภาพรวม">E<span>／</span></a>
+          <div class="brand-copy"><b>EGAT</b><small>Feasibility Platform</small></div>
+          <button id="sidebar-close" aria-label="ปิดเมนู">×</button>
+        </div>
+        <div class="project-section-heading">
+          <span>หัวข้อการลงทุน</span
+          ><button id="sidebar-add" aria-label="เพิ่มโครงการลูกค้า">＋</button>
+        </div>
+        <div id="project-tree" class="project-tree"></div>
+        <div class="side-bottom">
+          <div class="account" id="account" hidden>
+            <span id="account-label"></span
+            ><button id="account-action" class="text-button" type="button"></button>
+          </div>
+          <div class="local-status" id="local-status">กำลังเตรียมพื้นที่ทำงาน…</div>
+          <p>แต่ละโครงการลูกค้ามีสมมติฐานแยกกัน<br />บันทึกอัตโนมัติทุกครั้งที่แก้ไข</p>
+          <button id="reset" class="text-button">คืนค่าตัวอย่างโครงการที่เลือก</button>
+        </div>
+      </aside>
+      <div class="workspace">
+        <header class="topbar">
+          <button id="sidebar-open" aria-label="เปิดเมนูโครงการ" aria-expanded="false">☰</button>
+          <div class="wordmark">EGAT <span>/</span> <small>ENERGY WORKSPACE</small></div>
+          <div class="top-actions">
+            <a class="home-link" href="/" aria-label="กลับหน้าแรก" title="กลับหน้าแรก"
+              ><svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3.5 10.6 12 3.8l8.5 6.8" />
+                <path d="M5.8 9v10.2h4.4v-5.6h3.6v5.6h4.4V9" /></svg></a
+            ><button class="button quiet" id="print">↗ พิมพ์</button
+            ><button class="button primary" id="export">↓ ส่งออก CSV</button>
+          </div>
+        </header>
+        <section class="product-picker" aria-label="เลือกผลิตภัณฑ์">
+          <div class="picker-heading">
+            <div>
+              <span class="eyebrow">YOUR ENERGY PORTFOLIO</span>
+              <h2>เลือกผลิตภัณฑ์<span>.</span></h2>
+            </div>
+            <small>กดที่โมเดลเพื่อสลับผลิตภัณฑ์</small>
+          </div>
+          <div id="product-tabs" class="product-tabs" role="group" aria-label="ผลิตภัณฑ์"></div>
+        </section>
+        <nav id="rail-menu" class="analysis-nav" aria-label="มุมมองโครงการ"></nav>
+        <div class="page-heading">
+          <div>
+            <div class="eyebrow" id="page-kicker">YOUR ENERGY. A CLEARER PICTURE.</div>
+            <h1 id="page-title">ภาพรวมการลงทุน<span>.</span></h1>
+            <p id="active-project-label" class="active-project-label"></p>
+          </div>
+          <div class="page-tools">
+            <span class="sample-tag">ข้อมูลสมมติ</span
+            ><button class="text-button" id="edit-project">ปรับสมมติฐาน ↗</button>
+          </div>
+        </div>
+        <section id="decision-panel" class="decision-panel" aria-label="การตัดสินใจลงทุน"></section>
+        <div class="body-grid">
+          <main id="content" tabindex="-1"></main>
+          <aside class="context-panel">
+            <div class="context-head">
+              <div>
+                <span class="eyebrow">PROJECT SNAPSHOT</span>
+                <h2 id="context-title">Battery</h2>
+              </div>
+              <span class="round-tag" id="context-icon">ϟ</span>
+            </div>
+            <div class="context-project" id="context-project"></div>
+            <section class="context-block" id="context-assumptions"></section>
+            <section class="context-block" id="context-recovery"></section>
+            <div class="context-note">
+              <span>✧</span>
+              <div>
+                <b>พื้นที่ทดลองของคุณ</b>
+                <p>ปรับตัวเลขได้แยกแต่ละลูกค้า<br />บันทึกอัตโนมัติ</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+        <footer>
+          EGAT Feasibility Platform <span>WORKSPACE V4 · MIDNIGHT / NAVY / SUNSET</span>
+        </footer>
+      </div>
+    </div>
+    <dialog id="chart-dialog">
+      <div class="dialog-top">
+        <div>
+          <span class="eyebrow">A CLOSER LOOK</span>
+          <h2 id="dialog-title"></h2>
+        </div>
+        <button class="close-button" aria-label="ปิดกราฟ">×</button>
+      </div>
+      <div id="dialog-chart"></div>
+    </dialog>
+    <div class="sidebar-shade" id="sidebar-shade"></div>
+    <dialog id="project-dialog" aria-labelledby="project-dialog-title">
+      <form id="project-form">
+        <div class="dialog-top">
+          <div>
+            <span class="eyebrow" id="project-dialog-product"></span>
+            <h2 id="project-dialog-title">เพิ่มโครงการลูกค้า</h2>
+          </div>
+          <button
+            type="button"
+            class="close-button"
+            id="project-dialog-close"
+            aria-label="ปิดหน้าต่างโครงการ"
+          >
+            ×
+          </button>
+        </div>
+        <label class="field project-name-label"
+          >ชื่อโครงการ / ลูกค้า<input
+            id="project-name"
+            required
+            maxlength="80"
+            autocomplete="off"
+            placeholder="เช่น ลูกค้าคนที่ 5 หรือ โรงงานบางปะกง"
+        /></label>
+        <div id="project-seed-options">
+          <label class="seed-option"
+            ><input type="radio" name="seed" value="template" checked />
+            เริ่มจากค่าตัวอย่างของผลิตภัณฑ์</label
+          ><label class="seed-option"
+            ><input type="radio" name="seed" value="copy" id="copy-seed" />
+            คัดลอกค่าจากโครงการที่เลือก</label
+          >
+        </div>
+        <p class="project-modal-note">โครงการใหม่แก้ตัวเลขได้อิสระจากโครงการอื่น</p>
+        <p id="project-form-error" role="alert"></p>
+        <div class="project-modal-actions">
+          <button type="button" class="button" id="project-cancel">ยกเลิก</button
+          ><button type="submit" class="button primary" id="project-submit">เพิ่มโครงการ →</button>
+        </div>
+      </form>
+    </dialog>
+    <div class="toast" id="toast" role="status">
+      <span id="toast-message"></span><button id="undo-delete" hidden>เลิกทำ</button>
+    </div>
+    <script type="module" src="/src/app.js"></script>
+  </body>
+</html>

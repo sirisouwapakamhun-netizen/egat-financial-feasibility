@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EGAT · ลงทุนพลังงาน มองเห็นความคุ้มค่า</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#0c1321" />
+    <meta
+      name="description"
+      content="แพลตฟอร์มประเมินการลงทุน Solar PPA, Solar + Battery และ Battery ด้วยข้อมูลที่คุณกำหนด"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="landing">
+    <header class="lnav">
+      <a href="/" class="lnav-brand" aria-label="EGAT หน้าแรก"
+        ><span class="lnav-mark">E</span> EGAT</a
+      >
+      <nav class="lnav-menu" aria-label="เมนูหลัก">
+        <a href="#solutions">โซลูชัน</a><a href="#platform">แพลตฟอร์ม</a
+        ><a href="#method">วิธีประเมิน</a>
+      </nav>
+      <div class="lnav-cta">
+        <a href="/app" class="lbtn ghost">เข้าสู่ระบบ</a
+        ><a href="/app?demo" class="lbtn solid">ทดลองใช้งาน →</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-bg" aria-hidden="true"></div>
+        <div class="hero-head">
+          <span class="hero-badge">◆ แพลตฟอร์มประเมินการลงทุนพลังงาน</span>
+          <h1>ลงทุนพลังงาน <span>มองเห็นความคุ้มค่า</span></h1>
+          <p class="hero-sub">
+            ประเมิน Battery และ Solar ด้วยข้อมูลที่คุณกำหนด<br />เปรียบเทียบผลตอบแทน ดูจุดคุ้มทุน
+            และวางแผนการลงทุนในที่เดียว
+          </p>
+          <div class="hero-actions">
+            <a href="/app?demo" class="lbtn solid lg">ทดลองโครงการตัวอย่าง →</a
+            ><a href="#platform" class="lbtn ghost lg">ดูผลวิเคราะห์</a>
+          </div>
+          <p class="hero-helper">ไม่ต้องสมัคร · ข้อมูลตัวอย่างแยกจากโครงการจริง</p>
+        </div>
+        <div class="hero-3d" id="hero-3d" data-compact="false">
+          <span id="canvas-wrap" role="img" aria-label="โมเดล 3 มิติ ระบบ Solar + Battery"></span>
+        </div>
+      </section>
+
+      <section class="landing-section" id="solutions">
+        <div class="section-head" data-reveal>
+          <span>DESIGNED FOR YOUR DECISION</span>
+          <h2>จากสมมติฐาน สู่การตัดสินใจ</h2>
+          <p>สำรวจโอกาสของ Solar PPA, Solar + Battery และ Battery</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card" data-reveal>
+            <div class="feature-num">01</div>
+            <h3>ปรับสมมติฐาน</h3>
+            <p>กำหนดเงินลงทุน รายได้ ค่าใช้จ่าย และอายุโครงการให้สอดคล้องกับงานของคุณ</p>
+          </article>
+          <article class="feature-card" data-reveal>
+            <div class="feature-num">02</div>
+            <h3>มองเห็นจุดคุ้มทุน</h3>
+            <p>ดู NPV, IRR และปีคืนทุนทั้งแบบปกติและคิดลด พร้อมติดตามในกราฟเดียว</p>
+          </article>
+          <article class="feature-card" data-reveal>
+            <div class="feature-num">03</div>
+            <h3>เปรียบเทียบและส่งต่อ</h3>
+            <p>เปรียบเทียบผลิตภัณฑ์และลูกค้า ส่งออก CSV หรือพิมพ์รายงานเพื่อใช้ประกอบการพิจารณา</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="landing-section platform-preview" id="platform">
+        <div class="section-head" data-reveal>
+          <span>A CLEARER PICTURE</span>
+          <h2>เห็นผลลัพธ์ ก่อนเริ่มโครงการจริง</h2>
+          <p id="example-caption">ตัวอย่างจาก Battery ตามไฟล์ BESS Feasibility Model</p>
+        </div>
+        <div class="preview-metrics" data-reveal>
+          <div><small>อัตราผลตอบแทน · IRR</small><strong id="ex-irr">—</strong></div>
+          <div><small>จุดคุ้มทุนปกติ</small><strong id="ex-payback">—</strong></div>
+          <div><small>จุดคุ้มทุนคิดลด</small><strong id="ex-dpayback">—</strong></div>
+        </div>
+        <p class="preview-disclaimer">ข้อมูลสมมติเพื่อสาธิตระบบ ไม่ใช่ผลตอบแทนที่รับประกัน</p>
+        <a href="/app?demo" class="lbtn solid lg">เปิดแดชบอร์ดและลองปรับค่า ↗</a>
+      </section>
+
+      <section class="landing-section method-section" id="method">
+        <div data-reveal>
+          <span class="method-kicker">UNDERSTAND THE NUMBERS</span>
+          <h2>เข้าใจที่มาของตัวเลข</h2>
+          <p>
+            ผลวิเคราะห์คำนวณจากสมมติฐานของแต่ละโครงการลูกค้า
+            คุณสามารถดูตารางรายปีและส่งออกข้อมูลเพื่อตรวจสอบได้
+          </p>
+        </div>
+        <div class="faq" data-reveal style="--d: 1">
+          <details>
+            <summary>จุดคุ้มทุนคำนวณอย่างไร?</summary>
+            <p>
+              ปีที่กระแสเงินสดสะสมแตะศูนย์ครั้งแรก โดยประมาณเศษปีแบบเส้นตรง
+              แบบคิดลดจะปรับกระแสเงินสดด้วยอัตราคิดลดที่กำหนดก่อนสะสม รวมเงินลงทุน ค่าใช้จ่าย
+              ค่าเปลี่ยนอุปกรณ์ และมูลค่าซากตามสมมติฐาน
+            </p>
+          </details>
+          <details>
+            <summary>ผลประหยัดของ Battery มาจากไหน?</summary>
+            <p>
+              คำนวณตามไฟล์ BESS Feasibility Model: peak shaving, tariff management และส่วนลด demand
+              charge จากขนาดแบตเตอรี่ ต้นทุนต่อ kWh และอัตราค่าไฟที่กำหนด
+              ยังไม่รวมการเสื่อมของแบตเตอรี่หรือภาษี
+            </p>
+          </details>
+          <details>
+            <summary>ข้อมูลทดลองกับบัญชีจริงต่างกันอย่างไร?</summary>
+            <p>
+              โหมดทดลองใช้ข้อมูลสมมติและเก็บการปรับค่าในเบราว์เซอร์นี้เท่านั้น เมื่อเข้าสู่ระบบ
+              โครงการลูกค้าจะบันทึกบนคลาวด์และเห็นได้เฉพาะบัญชีของคุณ
+            </p>
+          </details>
+        </div>
+      </section>
+    </main>
+
+    <footer class="lfoot">
+      EGAT Feasibility Platform · เครื่องมือประกอบการวิเคราะห์การลงทุนพลังงาน
+    </footer>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
