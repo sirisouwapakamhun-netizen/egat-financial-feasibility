@@ -1,5 +1,7 @@
 # EGAT Feasibility Platform
 
+🔗 **เว็บไซต์:** https://egat-finacial-feasibility.vercel.app · [ทดลองแดชบอร์ด](https://egat-finacial-feasibility.vercel.app/app?demo)
+
 แพลตฟอร์มประเมินการลงทุน Solar PPA, Solar + Battery และ Battery
 ดู NPV, IRR, จุดคุ้มทุนแบบปกติและคิดลด เปรียบเทียบโครงการ ส่งออก CSV และพิมพ์รายงาน
 
