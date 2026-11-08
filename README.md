@@ -57,7 +57,7 @@ npm run build                # ได้ไฟล์ใน dist/
 
 ## Supabase
 
-แดชบอร์ดใช้ตาราง `client_projects` และ `workspace_settings` ค่าเชื่อมต่ออยู่ใน environment variables:
+แดชบอร์ดใช้ตาราง `client_projects` และ `workspace_settings` (สร้างด้วย `supabase/schema.sql` ใน SQL Editor ของ Supabase) ค่าเชื่อมต่ออยู่ใน environment variables:
 
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_PUBLISHABLE_KEY` (publishable key เปิดเผยฝั่งเว็บได้ ข้อมูลป้องกันด้วย Row Level Security)
